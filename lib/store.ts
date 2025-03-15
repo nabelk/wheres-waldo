@@ -1,11 +1,23 @@
-import { configureStore } from "@reduxjs/toolkit";
 import gameReducer from "./features/game/gameSlice";
+import { persistStore, persistReducer } from "redux-persist";
+import storage from "redux-persist/lib/storage";
+import { configureStore } from "@reduxjs/toolkit";
 
-export const store = configureStore({
+const persistConfig = {
+  key: "root",
+  storage, // Saves to localStorage
+};
+
+const persistedGameReducer = persistReducer(persistConfig, gameReducer);
+
+const store = configureStore({
   reducer: {
-    game: gameReducer,
+    game: persistedGameReducer,
   },
 });
 
-export type AppDispatch = typeof store.dispatch;
+export const persistor = persistStore(store);
+export default store;
+
 export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
