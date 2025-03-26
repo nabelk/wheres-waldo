@@ -1,30 +1,35 @@
 "use client";
+
+import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/lib/store";
 import { increment } from "@/lib/features/game/gameSlice";
-import { useEffect, useState } from "react";
 
 export default function GameTimer() {
   const dispatch = useDispatch();
   const totalSeconds = useSelector((state: RootState) => state.game.timer);
-  const [milliseconds, setMilliseconds] = useState(0);
-
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
+  const [milliseconds, setMilliseconds] = useState<number>(0);
 
   useEffect(() => {
-    const interval = setInterval(() => {
+    const secondInterval = setInterval(() => {
+      dispatch(increment());
+    }, 1000);
+
+    const millisecondInterval = setInterval(() => {
       setMilliseconds((prev) => {
-        if (prev >= 990) {
-          dispatch(increment());
-          return 0;
-        }
+        if (prev >= 990) return 0;
         return prev + 10;
       });
     }, 10);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(secondInterval);
+      clearInterval(millisecondInterval);
+    };
   }, [dispatch]);
+
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
 
   return (
     <div>
