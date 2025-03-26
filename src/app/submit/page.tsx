@@ -1,9 +1,10 @@
 "use client";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/lib/store";
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useEffect } from "react";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const nameSchema = z
   .string()
@@ -26,9 +27,17 @@ export default function SubmitScore() {
 
   const isGameFinished = characterFound.every((char) => char.found);
 
-  if (!isGameFinished) {
-    router.push("/");
-  }
+  useEffect(() => {
+    if (!isGameFinished) {
+      toast.error("You must finish the game to submit your score.", {
+        style: {
+          color: "#f7adee",
+          backgroundColor: "#440829",
+        },
+      });
+      router.push("/");
+    }
+  }, [isGameFinished, router]);
 
   async function handleSubmit(e: FormEvent) {
     setIsLoading(true);

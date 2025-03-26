@@ -10,6 +10,7 @@ import Image from "next/image";
 import { charactersImg } from "@/src/app/component/gameCharacters";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function CharactersOption() {
   const clickPosition = useSelector(
@@ -22,14 +23,27 @@ export default function CharactersOption() {
   const router = useRouter();
 
   const isGameFinished = characters.every((char) => char.found);
-  if (isGameFinished) router.push("/submit");
+
+  useEffect(() => {
+    if (isGameFinished) {
+      toast.success("The game has ended, please submit your score", {
+        style: {
+          color: "#f7adee",
+          backgroundColor: "#440829",
+        },
+      });
+      router.push("/submit");
+    }
+  }, [isGameFinished, router]);
 
   const threshold = 0.05;
 
   const handleCharacterSelection = async (characterName: string) => {
-    const charac = await fetch(`/api/characters/${characterName}`).then((res) =>
-      res.json()
-    );
+    const charac = await fetch(`/api/characters/${characterName}`, {
+      headers: {
+        "x-api-key": process.env.NEXT_PUBLIC_API_KEY as string,
+      },
+    }).then((res) => res.json());
 
     const isClickPositionCorrect =
       Math.abs(charac!.x - clickPosition.x) < threshold &&
@@ -60,6 +74,8 @@ export default function CharactersOption() {
         },
       });
     }
+    const isMobile = window.matchMedia("(max-width: 450px)").matches;
+    if (isMobile) dispatch(setClickPosition({ x: 0, y: 0 }));
   };
   return (
     <>
