@@ -15,7 +15,7 @@ datasource db {
 
 model CharacterPosition {
   id            Int      @id @default(autoincrement())
-  characterName String
+  characterName String   @unique
   x             Float
   y             Float
   createdAt     DateTime @default(now())
