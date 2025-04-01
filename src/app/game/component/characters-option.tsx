@@ -10,7 +10,7 @@ import Image from "next/image";
 import { charactersImg } from "@/src/app/component/gameCharacters";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 export default function CharactersOption() {
   const clickPosition = useSelector(
@@ -23,6 +23,16 @@ export default function CharactersOption() {
   const router = useRouter();
 
   const isGameFinished = characters.every((char) => char.found);
+  const isMobile = window.matchMedia("(max-width: 450px)").matches;
+  const charactersFoundCount = useRef<number>(
+    characters.filter((char) => char.found).length
+  );
+
+  useEffect(() => {
+    charactersFoundCount.current = characters.filter(
+      (char) => char.found
+    ).length;
+  }, [characters]);
 
   useEffect(() => {
     if (isGameFinished) {
@@ -66,6 +76,7 @@ export default function CharactersOption() {
           color: "#3434ad",
         },
       });
+      charactersFoundCount.current += 1;
     } else {
       toast.error(`Try again! ${characterName} is somewhere else`, {
         style: {
@@ -74,8 +85,10 @@ export default function CharactersOption() {
         },
       });
     }
-    const isMobile = window.matchMedia("(max-width: 450px)").matches;
-    if (isMobile) dispatch(setClickPosition({ x: 0, y: 0 }));
+
+    if (isMobile && charactersFoundCount.current < 3) {
+      dispatch(setClickPosition({ x: 0, y: 0 }));
+    }
   };
   return (
     <>
