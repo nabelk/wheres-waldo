@@ -33,7 +33,11 @@ export default function Leaderboard({ modalOpen }: { modalOpen: boolean }) {
   };
 
   useEffect(() => {
-    fetch("/api/leaderboard")
+    fetch("/api/leaderboard", {
+      headers: {
+        "x-api-key": process.env.NEXT_PUBLIC_API_KEY as string,
+      },
+    })
       .then((res) => res.json())
       .then((data) => setLeaderboard(data));
   }, []);

@@ -55,7 +55,10 @@ export default function SubmitScore() {
     try {
       const response = await fetch("/api/submit", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": process.env.NEXT_PUBLIC_API_KEY as string,
+        },
         body: JSON.stringify({ name, time: timeString }),
       });
 
